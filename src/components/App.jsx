@@ -22,6 +22,8 @@ export const App = () => {
     setTextSearch(
       `${Date.now()}/${e.target.elements.search.value.toLowerCase()}`
     );
+    setImage([]);
+    setPage(1);
     console.log(e.target.elements.search.value);
   };
   useEffect(() => {
@@ -57,7 +59,7 @@ export const App = () => {
     }
   };
   const onLoadeMore = () => {
-    setPage(prev => prev.page + 1);
+    setPage(prev => prev + 1);
   };
 
   return (
