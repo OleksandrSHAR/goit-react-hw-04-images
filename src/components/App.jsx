@@ -3,95 +3,83 @@ import { GlobalStyle } from './GlobalStyle';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { getImg } from './Api/api';
 import { Searchbar } from './Searchbar/Searchbar';
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
-export class App extends Component {
-  state = {
-    image: [],
-    page: 1,
-    textSearch: '',
-    maxPages: 0,
-    error: false,
-    loading: false,
-    modal: false,
-    modalUrl: '',
-    modalAlt: '',
-  };
-  SubmitValue = e => {
-    this.setState({
-      textSearch: `${Date.now()}/${e.target.elements.search.value.toLowerCase()}`,
-      image: [],
-      page: 1,
-    });
+export const App = () => {
+  const [image, setImage] = useState([]);
+  const [page, setPage] = useState(1);
+  const [maxPages, setMaxPages] = useState(0);
+  const [textSearch, setTextSearch] = useState('');
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [modal, setModal] = useState(false);
+  const [modalUrl, setModalUrl] = useState('');
+  const [modalAlt, setModalAltl] = useState('');
+
+  const SubmitValue = e => {
+    setTextSearch(
+      `${Date.now()}/${e.target.elements.search.value.toLowerCase()}`
+    );
     console.log(e.target.elements.search.value);
   };
-  async componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.textSearch !== this.state.textSearch ||
-      prevState.page !== this.state.page
-    ) {
+  useEffect(() => {
+    async function getImage() {
       try {
-        this.setState({ loading: true, error: false });
-        const img = await getImg(this.state.textSearch, this.state.page);
-
-        this.setState(prev => ({
-          image: [...prev.image, ...img.hits],
-          maxPages: Math.round(img.totalHits / 12),
+        setLoading(true);
+        setError(false);
+        const img = await getImg(textSearch, page);
+        console.log(img);
+        setImage(prev => ({
+          ...prev,
+          ...img.hits,
         }));
-        if (prevState.page === this.state.page) {
-          toast.success(`You have ${img.totalHits} images`);
-        }
+        console.log(image);
+        setMaxPages(Math.round(img.totalHits / 12));
       } catch (error) {
-        this.setState({ error: true });
+        toast.error('Sorry ERROR');
+        setError(true);
       } finally {
-        this.setState({ loading: false });
+        setLoading(false);
       }
     }
-  }
-  onClickImg = e => {
-    const imgMod = this.state.image.filter(
-      img => img.webformatURL === e.target.src
-    );
+    getImage();
+  }, [textSearch, page]);
 
-    this.setState({
-      modal: true,
-      modalUrl: imgMod[0].largeImageURL,
-      modalAlt: imgMod[0].tags,
-    });
+  const onClickImg = e => {
+    const imgMod = image.filter(img => img.webformatURL === e.target.src);
+    setModal(true);
+    setModalUrl(imgMod[0].largeImageURL);
+    setModalAltl(imgMod[0].tags);
   };
-  onCloseModal = e => {
+  const onCloseModal = e => {
     if (e.target === e.currentTarget || e.code === `Escape`) {
-      this.setState({ modal: false });
+      setModal(false);
     }
   };
-  onLoadeMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+  const onLoadeMore = () => {
+    setPage(prev => prev.page + 1);
   };
-  render() {
-    const { image, loading, modal, modalUrl, modalAlt, page, maxPages } =
-      this.state;
 
-    return (
-      <div>
-        <Searchbar SubmitValue={this.SubmitValue} />
-        {image.length > 0 && (
-          <ImageGallery imagePac={image} onClickImg={this.onClickImg} />
-        )}
-        {modal && (
-          <Modal
-            modalUrl={modalUrl}
-            modalAlt={modalAlt}
-            onCloseModal={this.onCloseModal}
-          />
-        )}
-        {image.length > 0 && page !== maxPages && (
-          <LoadMore onLoadeMore={this.onLoadeMore} />
-        )}
-        <Loader loading={loading} />
-        <GlobalStyle />
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <Searchbar SubmitValue={SubmitValue} />
+      {image.length > 0 && (
+        <ImageGallery imagePac={image} onClickImg={onClickImg} />
+      )}
+      {modal && (
+        <Modal
+          modalUrl={modalUrl}
+          modalAlt={modalAlt}
+          onCloseModal={onCloseModal}
+        />
+      )}
+      {image.length > 0 && page !== maxPages && (
+        <LoadMore onLoadeMore={onLoadeMore} />
+      )}
+      <Loader loading={loading} />
+      <GlobalStyle />
+    </div>
+  );
+};
