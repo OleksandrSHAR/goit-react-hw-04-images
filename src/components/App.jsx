@@ -12,7 +12,7 @@ export const App = () => {
   const [page, setPage] = useState(1);
   const [maxPages, setMaxPages] = useState(0);
   const [textSearch, setTextSearch] = useState('');
-  const [error, setError] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState(false);
   const [modalUrl, setModalUrl] = useState('');
@@ -28,7 +28,7 @@ export const App = () => {
     async function getImage() {
       try {
         setLoading(true);
-        setError(false);
+
         const img = await getImg(textSearch, page);
 
         setImage(prev => ({
@@ -38,7 +38,6 @@ export const App = () => {
         setMaxPages(Math.round(img.totalHits / 12));
       } catch (error) {
         toast.error('Sorry ERROR');
-        setError(true);
       } finally {
         setLoading(false);
       }
