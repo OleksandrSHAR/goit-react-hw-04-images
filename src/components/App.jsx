@@ -30,12 +30,11 @@ export const App = () => {
         setLoading(true);
         setError(false);
         const img = await getImg(textSearch, page);
-        console.log(img);
+
         setImage(prev => ({
           ...prev,
           ...img.hits,
         }));
-        console.log(image);
         setMaxPages(Math.round(img.totalHits / 12));
       } catch (error) {
         toast.error('Sorry ERROR');
