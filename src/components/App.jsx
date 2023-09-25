@@ -26,6 +26,7 @@ export const App = () => {
     setPage(1);
     console.log(e.target.elements.search.value);
   };
+
   useEffect(() => {
     async function getImage() {
       try {
@@ -33,10 +34,7 @@ export const App = () => {
 
         const img = await getImg(textSearch, page);
 
-        setImage(prev => ({
-          ...prev,
-          ...img.hits,
-        }));
+        setImage(prev => [...prev, ...img.hits]);
         setMaxPages(Math.round(img.totalHits / 12));
       } catch (error) {
         toast.error('Sorry ERROR');
@@ -44,7 +42,9 @@ export const App = () => {
         setLoading(false);
       }
     }
-    getImage();
+    if (textSearch !== '') {
+      getImage();
+    }
   }, [textSearch, page]);
 
   const onClickImg = e => {

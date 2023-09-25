@@ -8,7 +8,7 @@ export const ImageGalleryItem = ({
   largeImageURL,
 }) => {
   return (
-    <ImgGalleryItem key={id} id={id} class="gallery-item">
+    <ImgGalleryItem key={id} id={id}>
       <ImgItem src={webformatURL} alt={tags} onClick={onClickImg} />
     </ImgGalleryItem>
   );
